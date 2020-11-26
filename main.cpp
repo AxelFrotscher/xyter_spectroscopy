@@ -36,10 +36,13 @@ int main() {
          "../data/XYTER_201119_143946_for7200s.root",       // 241 Am spectrum location
          "../results/241Am_201119_143946.pdf"},             // output file location
         {"../data/outputcal_201120_101026.txt",             // calibration location
-         "../data/XYTER_201120_101026_for60s.root",       // 241 Am spectrum location
-         "../results/241Am_201120_101026.pdf"}};            // output file location
+         "../data/XYTER_201120_101026_for60s.root",         // 241 Am spectrum location
+         "../results/241Am_201120_101026.pdf"},
+        {"../data/outputcal_201123_093523.txt",             // calibration location
+         "../data/XYTER_201123_093523_for5400s.root",       // 241 Am spectrum location
+         "../results/241Am_201123_093523.pdf"}};            // output file location
 
-    const int s_no = 1;
+    const int s_no = 2;
     //Get the weights of each comparator
     std::ifstream myfile;
     myfile.open (settings.at(s_no).at(0));
@@ -79,7 +82,7 @@ int main() {
     // Get a distribution of events in a nice std::vector
     int ADC;
     spectrumtree->SetBranchAddress("nadc",&ADC);
-    TH1D raw_hist("raw241AmSource", "{}^{241}Am Source test, 2h", num_com, 0.5, num_com + 0.5);
+    TH1D raw_hist("raw241AmSource", "{}^{241}Am Source test, 1.5h", num_com, 0.5, num_com + 0.5);
     int nentries = (Int_t)spectrumtree->GetEntries();
     for (int i=0; i<nentries; i++) {
         spectrumtree->GetEntry(i);
@@ -89,7 +92,7 @@ int main() {
     for(int i = 1; i < (num_com + 1); i++) raw_spectrum.push_back(raw_hist.GetBinContent(i));
 
     // Merge data into transformed histogram.
-    TH1D cleaned_hist("241AmSource", "{}^{241}Am Source test, 2h", num_com, weights.data());
+    TH1D cleaned_hist("241AmSource", "{}^{241}Am Source test, 1.5h", num_com, weights.data());
     for(int i = 1; i < (num_com + 1); i++){
         double bin_width = weights.at(i)-weights.at(i-1);
         if(!bin_width) bin_width += 1;
@@ -97,7 +100,7 @@ int main() {
         cleaned_hist.SetBinContent(i, (double)raw_hist.GetBinContent(i)/bin_width);
     }
 
-    TF1 *f1 = new TF1("f1","gaus",11,30);
+    TF1 *f1 = new TF1("f1","gaus",10,25);
     cleaned_hist.Fit(f1, "R");
 
     TCanvas source_canvas("sourcecanvas", "{}^{241}Am Source test, 2h",
