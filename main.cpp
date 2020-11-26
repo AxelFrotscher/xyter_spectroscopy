@@ -34,9 +34,12 @@ int main() {
     const std::vector<std::array<std::string, 3>> settings{
         {"../data/outputcal_201119_143946.txt",             // calibration location
          "../data/XYTER_201119_143946_for7200s.root",       // 241 Am spectrum location
-         "../results/241Am_201119_143946.pdf"}};            // output file location
+         "../results/241Am_201119_143946.pdf"},             // output file location
+        {"../data/outputcal_201120_101026.txt",             // calibration location
+         "../data/XYTER_201120_101026_for60s.root",       // 241 Am spectrum location
+         "../results/241Am_201120_101026.pdf"}};            // output file location
 
-    const int s_no = 0;
+    const int s_no = 1;
     //Get the weights of each comparator
     std::ifstream myfile;
     myfile.open (settings.at(s_no).at(0));
@@ -61,8 +64,10 @@ int main() {
     std::vector<double> weights(num_com + 1);
     weights.at(0) = 0.5;
     weights.back() = num_com + 0.5;
-    for (int i=1; i<31; i++) weights.at(i) = (double)
-            (sum_comp.at(i-1) - sum_comp.at(i))/(sum_comp.at(0)-sum_comp.back()) * num_com + weights.at(i-1);
+    for (int i=1; i<31; i++) weights.at(i) = std::max(0.1, (double)
+            (sum_comp.at(i-1) - sum_comp.at(i))/(sum_comp.at(0)-sum_comp.back()) *
+            (num_com - 1)) + weights.at(i-1);
+
     //weights.at(15) = 15.8;
 
     // Read in the root file containing the 241Am source data
@@ -92,21 +97,19 @@ int main() {
         cleaned_hist.SetBinContent(i, (double)raw_hist.GetBinContent(i)/bin_width);
     }
 
-    TF1 *f1 = new TF1("f1","gaus",10,28);
+    TF1 *f1 = new TF1("f1","gaus",11,30);
     cleaned_hist.Fit(f1, "R");
 
     TCanvas source_canvas("sourcecanvas", "{}^{241}Am Source test, 2h",
                                  800,450);
     gStyle->SetOptFit(0012);
-    gStyle->SetStatX(0.86);
+    gStyle->SetStatX(0.41);
     gStyle->SetStatY(0.8);
     gStyle->SetStatH(0.1);
     gStyle->SetStatW(0.14);
     source_canvas.SetTicks();
-    // cleaned_hist.SetStats(false);
     cleaned_hist.GetYaxis()->SetTitle("counts");
     cleaned_hist.GetXaxis()->SetTitle("ADC bit");
-    cleaned_hist.GetYaxis()->SetRangeUser(0, 1.8E5);
     cleaned_hist.Draw();
     source_canvas.SaveAs(settings.at(s_no).at(2).c_str(), ".pdf");
 
