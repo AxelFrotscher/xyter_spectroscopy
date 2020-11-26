@@ -31,9 +31,15 @@ int main() {
     //This program aims to correct for the faulty calibration of the XYTER-Chip by integration
 
     const int num_com = 31;  // Number of comparators
+    const std::vector<std::array<std::string, 3>> settings{
+        {"../data/outputcal_201119_143946.txt",             // calibration location
+         "../data/XYTER_201119_143946_for7200s.root",       // 241 Am spectrum location
+         "../results/241Am_201119_143946.pdf"}};            // output file location
+
+    const int s_no = 0;
     //Get the weights of each comparator
     std::ifstream myfile;
-    myfile.open ("../data/outputcal.txt");
+    myfile.open (settings.at(s_no).at(0));
     assert(myfile.is_open());
 
     for(int i=0; i<32; i++) auto temp = getNextLineAndSplitIntoTokens(myfile);
@@ -60,8 +66,7 @@ int main() {
     //weights.at(15) = 15.8;
 
     // Read in the root file containing the 241Am source data
-    const std::string rootpath = "../data/XYTER_201119_143946_for7200s.root";
-    auto spectrumfile = TFile::Open(rootpath.c_str());
+    auto spectrumfile = TFile::Open(settings.at(s_no).at(1).c_str());
     assert(spectrumfile);
     auto spectrumtree = (TTree*)spectrumfile->Get("otree");
     assert(spectrumtree);
@@ -103,7 +108,7 @@ int main() {
     cleaned_hist.GetXaxis()->SetTitle("ADC bit");
     cleaned_hist.GetYaxis()->SetRangeUser(0, 1.8E5);
     cleaned_hist.Draw();
-    source_canvas.SaveAs("../results/241Am.pdf", ".pdf");
+    source_canvas.SaveAs(settings.at(s_no).at(2).c_str(), ".pdf");
 
     return 0;
 }
