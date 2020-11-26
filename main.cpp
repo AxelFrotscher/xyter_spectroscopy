@@ -60,7 +60,7 @@ int main() {
     //weights.at(15) = 15.8;
 
     // Read in the root file containing the 241Am source data
-    const std::string rootpath = "/Users/langweiler94/deinemutter/data/XYTER_201119_143946_for7200s.root";
+    const std::string rootpath = "../data/XYTER_201119_143946_for7200s.root";
     auto spectrumfile = TFile::Open(rootpath.c_str());
     assert(spectrumfile);
     auto spectrumtree = (TTree*)spectrumfile->Get("otree");
@@ -103,7 +103,7 @@ int main() {
     cleaned_hist.GetXaxis()->SetTitle("ADC bit");
     cleaned_hist.GetYaxis()->SetRangeUser(0, 1.8E5);
     cleaned_hist.Draw();
-    source_canvas.SaveAs("/Users/langweiler94/Desktop/241Am.pdf", ".pdf");
+    source_canvas.SaveAs("../results/241Am.pdf", ".pdf");
 
     return 0;
 }
