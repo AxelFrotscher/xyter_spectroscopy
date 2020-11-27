@@ -104,15 +104,22 @@ int main() {
     cleaned_hist.Fit(f1, "R");
 
     TCanvas source_canvas("sourcecanvas", "{}^{241}Am Source test, 2h",
-                                 800,450);
+                                 800,500);
     gStyle->SetOptFit(0012);
-    gStyle->SetStatX(0.41);
+    gStyle->SetStatX(0.39);
     gStyle->SetStatY(0.8);
     gStyle->SetStatH(0.1);
     gStyle->SetStatW(0.14);
+    source_canvas.SetBottomMargin(0.15);
     source_canvas.SetTicks();
     cleaned_hist.GetYaxis()->SetTitle("counts");
+    cleaned_hist.GetYaxis()->SetMaxDigits(4);
+    cleaned_hist.GetYaxis()->SetTitleSize(0.06);
+    cleaned_hist.GetYaxis()->SetTitleOffset(0.75);
+    cleaned_hist.GetYaxis()->SetLabelSize(0.06);
     cleaned_hist.GetXaxis()->SetTitle("ADC bit");
+    cleaned_hist.GetXaxis()->SetLabelSize(0.06);
+    cleaned_hist.GetXaxis()->SetTitleSize(0.06);
     cleaned_hist.Draw();
     source_canvas.SaveAs(settings.at(s_no).at(2).c_str(), ".pdf");
 
